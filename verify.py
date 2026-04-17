@@ -104,7 +104,7 @@ def verify_voice():
         # 6. Decision
         vault_path = os.path.join(os.getcwd(), "Vault")
 
-        if avg_score >= THRESHOLD:
+        if score >= THRESHOLD:
             print("\n" + "="*30)
             print("🔓 ACCESS GRANTED")
             print("Voice signature verified. Disengaging vault cloak...")
