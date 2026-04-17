@@ -1,4 +1,5 @@
-import sounddevice as sd
+import pyaudio
+import wave
 import numpy as np
 from scipy.io.wavfile import write
 import os
@@ -13,18 +14,27 @@ if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
 def record_sample(sample_num):
-    print(f"\n🎤 Preparing to record sample {sample_num}/5...")
-    print("Wait for the 'RECORDING' prompt and say: 'IDENTITY VERIFIED'")
-    time.sleep(1)
+    p = pyaudio.PyAudio()
+    stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100, input=True, frames_per_buffer=1024)
     
-    print("🔴 RECORDING...")
-    recording = sd.rec(int(SECONDS * FS), samplerate=FS, channels=1, dtype='int16')
-    sd.wait()  # Wait until recording is finished
-    print("✅ DONE.")
-    
+    print(f"\n🎤 Recording sample {sample_num}/5...")
+    frames = []
+    for _ in range(0, int(44100 / 1024 * 3)): # 3 seconds
+        data = stream.read(1024)
+        frames.append(data)
+        
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
     filename = os.path.join(OUTPUT_DIR, f"sample_{sample_num}.wav")
-    write(filename, FS, recording)
-    print(f"💾 Saved to {filename}")
+    wf = wave.open(filename, 'wb')
+    wf.setnchannels(1)
+    wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+    wf.setframerate(44100)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+    print(f"✅ Saved to {filename}")
 
 def main():
     print("--- VocalGate Enrollment System ---")
