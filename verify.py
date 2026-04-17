@@ -9,7 +9,7 @@ import pyaudio
 MODEL_FILE = "vocal_model.gmm"
 # Set this to the value train_model.py printed as "Suggested THRESHOLD"
 # After re-training, the script will tell you exactly what to put here.
-THRESHOLD = -10   # <-- UPDATE after re-running train_model.py
+THRESHOLD = -80   # <-- UPDATE after re-running train_model.py
 FS = 44100
 SECONDS = 3
 TARGET_SR = 22050  # Must match train_model.py
