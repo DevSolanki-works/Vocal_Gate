@@ -4,6 +4,7 @@ import pickle
 import librosa
 import numpy as np
 import pyaudio
+import subprocess
 
 # --- SETTINGS ---
 MODEL_FILE = "vocal_model.gmm"
@@ -101,22 +102,28 @@ def verify_voice():
         print(f"📡 Threshold        : {THRESHOLD}")
 
         # 6. Decision
-        if score >= THRESHOLD:
-            print("\n" + "=" * 30)
+        vault_path = os.path.join(os.getcwd(), "Vault")
+
+        if avg_score >= THRESHOLD:
+            print("\n" + "="*30)
             print("🔓 ACCESS GRANTED")
-            print("Welcome back, Dev.")
-            print("=" * 30)
-            # Uncomment to trigger a system action on success:
-            # import subprocess; subprocess.Popen(["explorer", "secret_folder"])
+            print("Voice signature verified. Disengaging vault cloak...")
+            print("="*30)
+            
+            # Remove System and Hidden attributes
+            subprocess.run(["attrib", "-h", "-s", vault_path])
+            
+            # Open the folder directly in Windows File Explorer
+            os.startfile(vault_path)
+            
         else:
-            gap = THRESHOLD - score
-            print("\n" + "!" * 30)
+            print("\n" + "!"*30)
             print("🔒 ACCESS DENIED")
-            print(f"Voice Profile Mismatch. (missed by {gap:.1f})")
-            print("!" * 30)
-            print("\n💡 If this is your voice and it keeps failing:")
-            print("   1. Re-run enroll.py in a quiet room")
-            print("   2. Re-run train_model.py and update THRESHOLD to its suggestion")
+            print("Voice Profile Mismatch. Intruder logged.")
+            print("!"*30)
+            
+            # Ensure the vault stays locked/hidden if someone tries to force it
+            subprocess.run(["attrib", "+h", "+s", vault_path])
 
     except Exception as e:
         print(f"❌ An error occurred during analysis: {e}")
